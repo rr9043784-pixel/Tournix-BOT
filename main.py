@@ -1,3 +1,4 @@
+
 import os
 import discord
 
@@ -10,7 +11,6 @@ from threading import Thread
 # =========================
 
 TOKEN = os.environ["DISCORD_TOKEN"]
-
 OWNER_ID = 1176149190192152626
 
 intents = discord.Intents.default()
@@ -36,11 +36,27 @@ def home():
 
 
 def run_flask():
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        use_reloader=False
+    )
 
 
-Thread(target=run_flask, daemon=True).start()
+# =========================
+# LOAD EXTENSIONS
+# =========================
+
+@bot.event
+async def setup_hook():
+    for extension in ("chest_api", "tournament"):
+        await bot.load_extension(extension)
+        print(f"Loaded extension: {extension}")
+
+    await bot.tree.sync()
+    print("Slash commands synced.")
+
 
 # =========================
 # BOT EVENTS
@@ -65,7 +81,7 @@ async def ping(ctx):
 
 
 # =========================
-# SLASH COMMANDS
+# SLASH COMMAND
 # =========================
 
 @bot.tree.command(
@@ -84,4 +100,9 @@ async def slash_ping(interaction: discord.Interaction):
 # =========================
 
 if __name__ == "__main__":
+    Thread(
+        target=run_flask,
+        daemon=True
+    ).start()
+
     bot.run(TOKEN)
