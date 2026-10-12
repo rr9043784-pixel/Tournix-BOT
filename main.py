@@ -1918,7 +1918,6 @@ async def mycode_cmd(ctx):
         await ctx.reply(
             "Use this command inside a tournament channel."
         )
-from __future__ import annotations
 
 import os
 import re
